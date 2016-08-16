@@ -123,19 +123,16 @@ class DbHandler {
      * @param String $email User email id
      */
     public function getUserByEmail($email) {
-        $stmt = $this->conn->prepare("SELECT id, name, email, api_key, status, created_at FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT name, email, api_key FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         if ($stmt->execute()) {
             // $user = $stmt->get_result()->fetch_assoc();
-            $stmt->bind_result($id, $name, $email, $api_key, $status, $created_at);
+            $stmt->bind_result($name, $email, $api_key);
             $stmt->fetch();
             $user = array();
             $user["name"] = $name;
             $user["email"] = $email;
             $user["api_key"] = $api_key;
-            $user["status"] = $status;
-            $user["created_at"] = $created_at;
-            $user["id"] = $id;
             $stmt->close();
             return $user;
         } else {
@@ -210,9 +207,9 @@ class DbHandler {
      * @param String $user_id user id to whom task belongs to
      * @param String $task task text
      */
-    public function createGluRec($user_id, $level) {
-        $stmt = $this->conn->prepare("INSERT INTO glucose(level) VALUES(?)");
-        $stmt->bind_param("s", $level);
+    public function createGluRec($user_id, $level, $devicetime) {
+        $stmt = $this->conn->prepare("INSERT INTO glucose(level, devicetime) VALUES(?, ?)");
+        $stmt->bind_param("ds", $level, $devicetime);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -261,12 +258,13 @@ class DbHandler {
      * Fetching all user tasks
      * @param String $user_id id of the user
      */
-    public function getAllUserTasks($user_id) {
-        $stmt = $this->conn->prepare("SELECT t.* FROM tasks t, user_tasks ut WHERE t.id = ut.task_id AND ut.user_id = ?");
+    public function getUserGlu($user_id) {
+        $stmt = $this->conn->prepare("SELECT t.* FROM (SELECT g.* FROM glucose g, user_glu ug WHERE g.id = ug.gid AND ug.uid = ? ORDER BY created_at DESC LIMIT 10) t ORDER BY created_at ASC");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $tasks = $stmt->get_result();
         $stmt->close();
+        
         return $tasks;
     }
 

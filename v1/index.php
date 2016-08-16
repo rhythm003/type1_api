@@ -102,9 +102,8 @@ $app->post('/login', function() use ($app) {
                     $response["error"] = false;
                     $response['name'] = $user['name'];
                     $response['email'] = $user['email'];
-                    $response['apiKey'] = $user['api_key'];
-                    $response['createdAt'] = $user['created_at'];
-                    $response['uid'] = $user['id'];
+                    $response['apikey'] = $user['api_key'];
+                    
                 } else {
                     // unknown error occurred
                     $response['error'] = true;
@@ -120,11 +119,12 @@ $app->post('/login', function() use ($app) {
         });
 
 $app->post('/glucose', 'authenticate', function() use ($app) {
-			global $user_id;
-			$response = array();
-			$level = $app->request->post('level');
+            global $user_id;
+            $response = array();
+            $level = floatval($app->request->post('level'));
+            $devicetime = $app->request->post('devicetime');
             $db = new DbHandler();
-            $glurec_id = $db->createGluRec($user_id, $level);
+            $glurec_id = $db->createGluRec($user_id, $level, $devicetime);
             if($glurec_id != NULL) {
                 $response['error'] = false;
                 $response['level'] = $level;
@@ -136,9 +136,9 @@ $app->post('/glucose', 'authenticate', function() use ($app) {
                 $response['message'] = 'Error creating post';
 
             }
-			echoRespnse(200, $response);
-			
-		});
+            echoRespnse(200, $response);
+            
+        });
 
 $app->get('/glucose/:id', 'authenticate', function($gid) use ($app) {
             global $user_id;
@@ -153,6 +153,23 @@ $app->get('/glucose/:id', 'authenticate', function($gid) use ($app) {
             }
             else {
                 $response['error'] = true;
+            }
+            echoRespnse(200, $response);
+        });
+
+$app->get('/glucose', 'authenticate', function() {
+            global $user_id;
+            $response = array();
+            $db = new DbHandler();
+            $rec = $db->getUserGlu($user_id);
+            $response['error'] = false;
+            $response['glurec'] = array();
+            while ($task = $rec->fetch_assoc()) {
+                $tmp = array();
+                $tmp["id"] = $task["id"];
+                $tmp["level"] = $task["level"];
+                $tmp["createdAt"] = $task["created_at"];
+                array_push($response["glurec"], $tmp);
             }
             echoRespnse(200, $response);
         });
