@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Create hashed password
+ * Code modified from AndroidHive REST API tutorial
+ */
 class PassHash {
 
     // blowfish

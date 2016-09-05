@@ -2,9 +2,7 @@
 
 /**
  * Handling database connection
- *
- * @author Ravi Tamada
- * @link URL Tutorial link
+ * Code modified from AndroidHive REST API tutorial
  */
 class DbConnect {
 

@@ -4,8 +4,7 @@
  * Class to handle all db operations
  * This class will have CRUD methods for database tables
  *
- * @author Ravi Tamada
- * @link URL Tutorial link
+ * Code modified from AndroidHive REST API tutorial
  */
 class DbHandler {
 

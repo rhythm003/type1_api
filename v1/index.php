@@ -1,4 +1,7 @@
 <?php
+/**
+ * Code modified from AndroidHive REST API tutorial
+ */
 require_once '../include/DbHandler.php';
 require_once '../include/PassHash.php';
 require_once '.././libs/Slim/Slim.php';
@@ -168,7 +171,7 @@ $app->get('/glucose', 'authenticate', function() {
                 $tmp = array();
                 $tmp["id"] = $task["id"];
                 $tmp["level"] = $task["level"];
-                $tmp["createdAt"] = $task["created_at"];
+                $tmp["devicetime"] = $task["devicetime"];
                 array_push($response["glurec"], $tmp);
             }
             echoRespnse(200, $response);
